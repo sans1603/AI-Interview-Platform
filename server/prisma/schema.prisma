@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         String      @id @default(cuid())
+  name       String
+  email      String      @unique
+  password   String
+  avatar     String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  interviews Interview[]
+}
+
+model Interview {
+  id                  String          @id @default(cuid())
+  title               String
+  role                String
+  experienceLevel     String
+  techStack           String
+  totalQuestions      Int
+  overallScore        Float?
+  startedAt           DateTime?
+  completedAt         DateTime?
+  userId              String
+  createdAt           DateTime        @default(now())
+  updatedAt           DateTime        @updatedAt
+  status              InterviewStatus @default(PENDING)
+  overallFeedback     String?
+  overallImprovements String?
+  overallStrengths    String?
+  user                User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questions           Question[]
+}
+
+model Question {
+  id             String    @id @default(cuid())
+  question       String
+  answer         String?
+  feedback       String?
+  score          Float?
+  timeTaken      Int?
+  interviewId    String
+  createdAt      DateTime  @default(now())
+  expectedAnswer String?
+  improvements   String?
+  order          Int?
+  strengths      String?
+  updatedAt      DateTime  @default(now()) @updatedAt
+  interview      Interview @relation(fields: [interviewId], references: [id], onDelete: Cascade)
+}
+
+model playing_with_neon {
+  id    Int    @id @default(autoincrement())
+  name  String
+  value Float? @db.Real
+}
+
+enum InterviewStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
